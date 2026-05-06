@@ -1,0 +1,30 @@
+name: Price Monitor – O'Reilly
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # todo dia às 09:00 UTC (06:00 BRT)
+  workflow_dispatch:
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r price-monitor/requirements-monitor.txt
+
+      - name: Run forecast
+        env:
+          SUPABASE_URL:     ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:     ${{ secrets.SUPABASE_KEY }}
+          PRICE_THRESHOLD:  ${{ secrets.PRICE_THRESHOLD }}
+        run: python src/forecast.py
