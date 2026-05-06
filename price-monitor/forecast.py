@@ -14,7 +14,7 @@ from prophet import Prophet
 from supabase import create_client
 
 SUPABASE_URL    = os.environ["SUPABASE_URL"]
-SUPABASE_KEY    = os.environ["SUPABASE_KEY"]
+SUPABASE_KEY    = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 PRICE_THRESHOLD = float(os.environ.get("PRICE_THRESHOLD", "75.00"))
 FORECAST_DAYS   = 90
 
