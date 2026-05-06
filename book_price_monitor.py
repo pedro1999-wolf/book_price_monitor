@@ -17,7 +17,7 @@ load_dotenv()
 
 SERPAPI_KEY = os.getenv("SERPAPI_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 TIMEZONE = ZoneInfo("America/Sao_Paulo")
 
