@@ -25,6 +25,6 @@ jobs:
       - name: Run forecast
         env:
           SUPABASE_URL:     ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY:     ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_KEY:     ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           PRICE_THRESHOLD:  "75.00"
         run: python price-monitor/forecast.py
