@@ -69,13 +69,6 @@ PLATFORMS = {
         "source_aliases": ["shopee"],
         "domains": ["shopee.com.br"],
     },
-    "aliexpress": {
-        "display_name": "AliExpress",
-        "type": "google_shopping",
-        "query_hint": "aliexpress",
-        "source_aliases": ["aliexpress", "ali express"],
-        "domains": ["aliexpress.com", "pt.aliexpress.com"],
-    },
     "magalu": {
         "display_name": "Magalu",
         "type": "google_shopping",
