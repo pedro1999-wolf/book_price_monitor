@@ -397,7 +397,7 @@ plat_hoje_view = plat_hoje_view[
 
 st.dataframe(
     plat_hoje_view,
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     column_config={
         "Preço hoje": st.column_config.NumberColumn(format="R$ %.2f"),
@@ -504,13 +504,34 @@ else:
             ))
 
             # Linha vertical separando histórico de previsão
-            fig.add_vline(
-                x=ultimo_hist_dt,
-                line=dict(color=INK_SOFT, width=1, dash="dash"),
-                annotation_text="hoje",
-                annotation_position="top",
-                annotation_font=dict(family="Oswald", size=11, color=INK_SOFT),
-            )
+            # Evita bug do Plotly ao usar add_vline com annotation_text em datas Pandas.
+            ultimo_hist_dt = pd.to_datetime(ultimo_hist_dt, errors="coerce")
+
+            if pd.notna(ultimo_hist_dt):
+                x_hoje = ultimo_hist_dt.to_pydatetime()
+
+                fig.add_shape(
+                    type="line",
+                    x0=x_hoje,
+                    x1=x_hoje,
+                    y0=0,
+                    y1=1,
+                    xref="x",
+                    yref="paper",
+                    line=dict(color=INK_SOFT, width=1, dash="dash"),
+                )
+
+                fig.add_annotation(
+                    x=x_hoje,
+                    y=1,
+                    xref="x",
+                    yref="paper",
+                    text="hoje",
+                    showarrow=False,
+                    xanchor="center",
+                    yanchor="bottom",
+                    font=dict(family="Oswald", size=11, color=INK_SOFT),
+                )
 
         fig.update_layout(
             paper_bgcolor=CREAM,
@@ -544,7 +565,7 @@ else:
                 bgcolor="rgba(0,0,0,0)",
             ),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         # Tabela de previsões (compacta) abaixo do gráfico
         if not prev_view.empty:
@@ -566,7 +587,7 @@ else:
                     "threshold_usado": "Alvo",
                     "gerado_em": "Gerado em",
                 }),
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
                 column_config={
                     "Previsto": st.column_config.NumberColumn(format="R$ %.2f"),
