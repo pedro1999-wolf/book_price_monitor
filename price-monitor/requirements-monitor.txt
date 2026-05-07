@@ -1,8 +1,0 @@
-prophet==1.1.6
-pystan==3.10.0
-pandas==2.2.2
-numpy==1.26.4
-requests==2.32.3
-supabase==2.5.0
-yfinance==0.2.40
-cmdstanpy==1.2.4
