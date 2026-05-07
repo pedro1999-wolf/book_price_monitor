@@ -1,0 +1,71 @@
+name: Monthly close — Amazon history
+
+on:
+  schedule:
+    # Dia 1 de cada mês, 03:00 UTC (00:00 BRT). Fecha o mês anterior.
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      periodo:
+        description: "Período a fechar (YYYY-MM). Vazio = mês anterior."
+        required: false
+        type: string
+      livro:
+        description: "book_key"
+        required: false
+        default: "data_science_do_zero_2ed"
+        type: string
+      skip_retrain:
+        description: "Pular re-treino do modelo"
+        required: false
+        default: false
+        type: boolean
+      strict:
+        description: "Falhar se não houver dados Amazon no período"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: monthly-close
+  cancel-in-progress: false
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-jobs.txt
+
+      - name: Run monthly close
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.periodo }}" ]; then
+            ARGS="$ARGS --periodo ${{ inputs.periodo }}"
+          fi
+          if [ -n "${{ inputs.livro }}" ]; then
+            ARGS="$ARGS --livro ${{ inputs.livro }}"
+          fi
+          if [ "${{ inputs.skip_retrain }}" = "true" ]; then
+            ARGS="$ARGS --skip-retrain"
+          fi
+          # Cron (sem inputs) → modo soft (sem --strict).
+          # Disparo manual com strict=true → adiciona --strict.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.strict }}" = "true" ]; then
+            ARGS="$ARGS --strict"
+          fi
+          echo "Running: python monthly_close.py $ARGS"
+          python monthly_close.py $ARGS

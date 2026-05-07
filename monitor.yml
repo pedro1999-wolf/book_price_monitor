@@ -1,0 +1,59 @@
+name: Retrain forecast — O'Reilly
+
+# Re-treina o modelo de previsão (Holt-Winters em log-preço) e regrava
+# previsoes_preco no Supabase.
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # todo dia às 09:00 UTC (06:00 BRT)
+  workflow_dispatch:
+    inputs:
+      horizon:
+        description: "Quantos meses prever"
+        required: false
+        default: "3"
+        type: string
+      threshold:
+        description: "Threshold de 'abaixo do alvo' (R$)"
+        required: false
+        default: "75.00"
+        type: string
+
+concurrency:
+  group: retrain-forecast
+  cancel-in-progress: true
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-jobs.txt
+
+      - name: Run retrain
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.horizon }}" ]; then
+            ARGS="$ARGS --horizon ${{ inputs.horizon }}"
+          fi
+          if [ -n "${{ inputs.threshold }}" ]; then
+            ARGS="$ARGS --threshold ${{ inputs.threshold }}"
+          fi
+          echo "Running: python retrain_forecast.py $ARGS"
+          python retrain_forecast.py $ARGS
