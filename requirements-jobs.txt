@@ -1,6 +1,0 @@
-# Dependências adicionais para os scripts de fechamento mensal e re-treino.
-# (Inclui as do app + libs de modelagem.)
--r requirements-app.txt
-numpy>=1.26
-scikit-learn>=1.4
-statsmodels>=0.14
