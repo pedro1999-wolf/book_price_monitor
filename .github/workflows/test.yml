@@ -1,0 +1,11 @@
+- name: Check env vars
+  env:
+    SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+    SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+  run: |
+    test -n "$SERPAPI_KEY" && echo "SERPAPI_KEY OK" || echo "SERPAPI_KEY MISSING"
+    test -n "$SUPABASE_URL" && echo "SUPABASE_URL OK" || echo "SUPABASE_URL MISSING"
+    test -n "$SUPABASE_SERVICE_ROLE_KEY" && echo "SUPABASE_SERVICE_ROLE_KEY OK" || echo "SUPABASE_SERVICE_ROLE_KEY MISSING"
+    test -n "$SUPABASE_KEY" && echo "SUPABASE_KEY OK" || echo "SUPABASE_KEY MISSING"
