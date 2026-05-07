@@ -1,5 +1,0 @@
-# Dependências dos GitHub Actions (monthly_close + retrain_forecast).
-# Inclui as deps do app Streamlit + libs de modelagem.
--r requirements.txt
-numpy>=1.26
-statsmodels>=0.14
