@@ -1,19 +1,19 @@
-name: Monitor book prices
+name: Book Price Monitor
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 12 * * *"
-  workflow_dispatch:
 
 jobs:
-  run-monitor:
+  run:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -21,9 +21,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-main.txt
 
-      - name: Run monitor
+      - name: Check env vars
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          test -n "$SERPAPI_KEY" && echo "SERPAPI_KEY OK" || echo "SERPAPI_KEY MISSING"
+          test -n "$SUPABASE_URL" && echo "SUPABASE_URL OK" || echo "SUPABASE_URL MISSING"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" && echo "SUPABASE_SERVICE_ROLE_KEY OK" || echo "SUPABASE_SERVICE_ROLE_KEY MISSING"
+          test -n "$SUPABASE_KEY" && echo "SUPABASE_KEY OK" || echo "SUPABASE_KEY MISSING"
+
+      - name: Run python book_price_monitor.py
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python book_price_monitor.py
